@@ -21,7 +21,9 @@ cffi and libcffi
 
 cd to your quicklisp local-project directory   
 git clone https://github.com/snells/cl-wlc   
-cd cl-wlc/wlc && mkdir target && cd target && cmake .. && make && sudo make install   
+cd cl-wlc   
+git submodule update --init --recursive   
+cd wlc && mkdir target && cd target && cmake .. && make && sudo make install   
 now you should be able to succesfully load cl-wlc from your lisp with (ql:quickload :cl-wlc)   
 
 
