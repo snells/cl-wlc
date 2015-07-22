@@ -118,7 +118,7 @@ In the original the interface struct are not typedef'ed  and I had to typedef th
 Can't remember if grovel couldn't be used without c struct being typedefined or was it for something else.      
 void wlc_exec(const char *bin, char *const args[]);   
 Coudln't get it work so I defined new function   
-void cl_exec(char \*bin) { wlc_exec(bin, (char *const[]) { bin, NULL }); }   
+void cl_exec(char *bin) { wlc_exec(bin, (char *const[]) { bin, NULL }); }   
 That's easier to translate with cffi.     
 When I tried allocating wlc-interface in lisp I couldn't get it to run.   
 So I made new function bare_s_interface which returns pointer to wlc_interface.   
