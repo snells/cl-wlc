@@ -11,7 +11,7 @@ Currently cl-wlc is unstable and might crash when executed.
 ### Dependencies
 
 
-Build tools for wlc   See https://github.com/Cloudef/wlc   
+Build tools for wlc, see https://github.com/Cloudef/wlc   
 [quicklisp](https://www.quicklisp.org/beta/)   
 cffi and libcffi   
 
