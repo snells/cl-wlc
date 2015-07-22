@@ -130,7 +130,7 @@
   (view wlc-handle)
   (parent wlc-handle))
 
-(defcfun "wlc-view_get_title" :string
+(defcfun "wlc_view_get_title" :string
   (view wlc-handle))
 (defcfun "wlc_view_set_title" :void
   (view wlc-handle)
