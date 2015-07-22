@@ -48,11 +48,9 @@
 	   :view-geometry
 	   :geometry-size
 	   :geometry-origin
-
-	   :exec-term
-	   :exec
-	   :c-wlc-exec))
-	   
+           
+           :wlc-terminate
+	   :cl-exec))	   
 
 	   
 	   
