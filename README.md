@@ -127,6 +127,7 @@ There might be no need for bare_s_interface after I started using grovel but I t
 
 ### Issues   
 
+(view-title view) will crash.   
 Crashes sometimes on start, no idea why.   
 When wlc is running and there is error the lisp won't go to debugger, instead it will just crash.   
 So any typo, type error, whatever that passes compiler will most likely cause crash somewhere.
