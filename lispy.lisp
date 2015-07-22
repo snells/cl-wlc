@@ -1,0 +1,60 @@
+(in-package :cl-wlc)
+(defun ref-handle (h &optional (offset 0))
+  (mem-aref h 'wlc-handle offset))
+(defun pt-handle (h &optional (offset 0))
+  (mem-aptr h 'wlc-handle offset))
+
+(defun exec (name)
+  (with-foreign-string (s name)
+    (cl-exec s)))
+
+
+(defun ref-wlc-modifiers (pt)
+  (list (struct-val pt 'wlc-modifiers 'leds)
+	(struct-val pt 'wlc-modifiers 'mods)))
+
+(defun ref-wlc-size (pt)
+  (list (struct-val pt 'wlc-size 'w)
+	(struct-val pt 'wlc-size 'h)))
+(defun (setf ref-wlc-size) (val pt)
+  (set-struct-val pt 'wlc-size 'w (car val))
+  (set-struct-val pt 'wlc-size 'h (cadr val)))
+
+(defun ref-wlc-origin (pt)
+  (list (struct-val pt 'wlc-origin 'x)
+	(struct-val pt 'wlc-origin 'y)))
+(defun (setf ref-wlc-origin) (val pt)
+  (set-struct-val pt 'wlc-origin 'x (car val))
+  (set-struct-val pt 'wlc-origin 'y (cadr val)))
+(defun ref-wlc-geometry (pt)
+  (list (ref-wlc-origin (struct-pt pt 'wlc-geometry 'origin))
+	(ref-wlc-size (struct-pt pt 'wlc-geometry 'size))))
+(defun (setf ref-wlc-geometry) (val pt)
+  (let* ((g (struct-pt pt 'wlc-geometry))
+	 (o (setf (ref-wlc-origin g) (car val)))
+	 (s (setf (ref-wlc-size g) (cadr val))))
+    (list o s)))
+
+(defun geometry-size (lst)
+  (cadr lst))
+(defun (setf geometry-size) (val lst)
+  (setf (cadr lst) val))
+(defun geometry-origin (lst)
+  (car lst))
+(defun (setf geometry-origin) (val lst)
+  (setf (car lst) val))
+
+(defun parse-mod-bit (pt)
+  (struct-val pt 'wlc-modifiers 'mods))
+
+(defmacro test-fns (view)
+  (let ((l '()))
+    (let ((fns '(#'managedp #'override-redirectp
+		 #'view-splashp #'view-fullscreenp #'view-parent
+		 #'view-state #'view-type #'view-output #'view-mask)))
+      (dolist (fn fns)
+	(push `(progn (format out "testing ~a~%" ,fn)
+		      (format out "~a~%" (funcall ,fn ,view))
+		      (format out "success ~a~%" ,fn)) l)))
+    `(progn ,@l)))
+
