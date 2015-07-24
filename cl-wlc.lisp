@@ -92,9 +92,9 @@
 (defun bare-wm ()
   (let* ((interface
 	  (foreign-funcall "bare_s_interface" :pointer))
-	 (argc 3)
+	 (argc 1)
 	 (argv (foreign-alloc :string
-			      :initial-contents '("dummy" "--log" "/home/log")
+			      :initial-contents '("dummy")
 			      :null-terminated-p t))
 	 (keyboard (alloc 'wlc-interface-keyboard))
 	 (view (alloc 'wlc-interface-view)))
