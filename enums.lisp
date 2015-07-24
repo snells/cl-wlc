@@ -3,23 +3,55 @@
   :ack-none
   :ack-pending
   :ack-net-commit)
-(defcenum log-type
+(defcenum wlc-log-type
   :log-info 
   :log-warn
   :log-error)
-(defcenum view-state-bit
+(defcenum wlc-view-state
   (:maximized 1)
   (:fullscreen 2)
   (:resizing 4)
   (:moving 8)
   (:activated 16))
 
-(defcenum view-type-bit
-  (:bit-override-redirect 1)
-  (:bit-unmanaged 2)
-  (:bit-splash 4)
-  (:bit-modal 8)
-  (:bit-poput 16))
+(defcenum wlc-view-type
+  (:override-redirect 1)
+  (:unmanaged 2)
+  (:splash 4)
+  (:modal 8)
+  (:poput 16))
+
+(defcenum modifier-bit
+	      (:mod-shift 1)
+	      (:mod-caps 2)
+	      (:mod-ctrl 4)
+	      (:mod-alt  8)
+	      (:mod-mod2 16)
+	      (:mod-mod3 32)
+	      (:mod-logo 64)
+	      (:mod-mod5 128))
+
+(defcenum wlc-button-state
+  (:released 0)
+  (:pressed 1))
+
+(defcenum wlc-touch-type
+  :down
+  :up
+  :motion
+  :frame
+  :cancel)
+
+(defcenum wlc-key-state
+  :released
+  :pressed)
+
+(defcenum wlc-scroll-axis
+  (:vertical 1)
+  (:horizontal 2))
+
+
+
 
 (defvar enum-to-constant-list
   '(((ack-none)
@@ -28,21 +60,27 @@
     ((log-info)
      (log-warn)
      (log-error))
-    ((state-maximized . 1)
-     (state-fullscreen . 2)
-     (state-resizing . 4)
-     (state-moving . 8)
-     (state-activated . 16))
-    ((bit-override . 1)
-     (bit-unmanaged . 2)
-     (bit-splash . 4)
-     (bit-modal . 8)
-     (bit-popup . 16))
-    ((key-released)
-     (key-pressed))
-    ((button-released)
-     (button-pressed))))
-     
+    ((maximized . 1)
+     (fullscreen . 2)
+     (resizing . 4)
+     (moving . 8)
+     (activated . 16))
+    ((override . 1)
+     (unmanaged . 2)
+     (splash . 4)
+     (modal . 8)
+     (popup . 16))
+    ((released)
+     (pressed))
+    ((mod-shift . 1)
+     (mod-caps . 2)
+     (mod-ctrl . 4)
+     (mod-alt . 8)
+     (mod-mod2 . 16)
+     (mod-mod3 . 32)
+     (mod-logo . 64)
+     (mod-mod5 . 128))))
+    
 (unless (boundp (intern (format nil "+~a+"
 				(caaar enum-to-constant-list))))
   (dolist (lst enum-to-constant-list)
@@ -55,27 +93,6 @@
 
 
 
-(defcenum modifier-bit
-	      (:bit-mod-shift 1)
-	      (:bit-mod-caps 2)
-	      (:bit-mod-ctrl 4)
-	      (:bit-mod-alt  8)
-	      (:bit-mod-mod2 16)
-	      (:bit-mod-mod3 32)
-	      (:bit-mod-logo 64)
-	      (:bit-mod-mod5 128))
-
-(defcenum button-state
-  (:button-state-released 0)
-  (:button-state-pressed 1))
-
-(defcenum key-state
-  :key-state-released
-  :key-state-pressed)
-
-(defcenum scroll-axis-bit
-  (:scroll-axis-vertical 1)
-  (:scroll-axis-horizontal 2))
 
 
     

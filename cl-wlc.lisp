@@ -10,7 +10,8 @@
 ;;; or should you just use the deprecated bare reference?
 
 
-(defun run-wm (argv &key view-created view-destroyed view-focus
+(defun run-wm (argv &key threaded
+		      view-created view-destroyed view-focus
 		      view-move-to-output
 		      output-created output-destroyed output-focus
 		      output-resolution keyboard-key pointer-button
@@ -35,10 +36,10 @@
   (if touch (setf callback-fn-touch-touch touch))
 
   (if compositor-ready (setf callback-fn-compositor-ready compositor-ready))
-
+  
   (let* ((interface ;(alloc 'c-wlc-interface))
-	 ;; I made c function to return pointer to interface
-	 ;; because the program would not run or would be really unstable
+	  ;; I made c function to return pointer to interface
+	  ;; because the program would not run or would be really unstable
 	  (foreign-funcall "bare_s_interface" :pointer))
 	 (argc (length argv))
 	 (c-argv (foreign-alloc :string
@@ -50,25 +51,28 @@
 	 (pointer (alloc 'wlc-interface-pointer)))
     (set-struct-val output 'wlc-interface-output 'created (callback output-created))
     (set-struct-val output 'wlc-interface-output 'resolution (callback output-resolution))
-    ;(set-struct-val output 'wlc-interface-output 'destroyed (callback output-destroyed))
+					;(set-struct-val output 'wlc-interface-output 'destroyed (callback output-destroyed))
     (set-struct-val interface 'wlc-interface 'output output)
     (set-struct-val pointer 'wlc-interface-pointer 'button (callback pointer-button))
     (set-struct-val interface 'wlc-interface 'pointer pointer)
     (set-struct-val view 'wlc-interface-view 'created (callback view-created))
     (set-struct-val view 'wlc-interface-view 'focus (callback view-focus))
-    ;(set-struct-val view 'wlc-interface-view 'destroyed (callback view-destroyed))
+					;(set-struct-val view 'wlc-interface-view 'destroyed (callback view-destroyed))
     (set-struct-val interface 'wlc-interface 'view view)
     (set-struct-val keyboard 'wlc-interface-keyboard 'key (callback keyboard-key))
     (set-struct-val interface 'wlc-interface 'keyboard keyboard)
     (format out "cl-wlc init~%")
-    ;(bt:make-thread (lambda ()
-    (unless (zerop (wlc-init interface argc c-argv))
-      (format out "cl-wlc init success~%cl-wlc running~%")
-      (wlc-run)
-      (format out "cl-wlc freeing lisp allocated variables~%")
-      (foreign-string-free c-argv)
-      (free output keyboard view pointer)
-      (format out "cl-wlc free success~%"))))
+    (if threaded
+	(bt:make-thread (lambda ()
+			  (unless (zerop (wlc-init interface argc c-argv))
+			  (format out "cl-wlc init success~%cl-wlc running~%")
+			  (wlc-run)
+			  (format out "cl-wlc freeing lisp allocated variables~%")
+			  (free output keyboard view pointer c-argv)
+			  (format out "cl-wlc free success~%"))))
+	(unless (zerop (wlc-init interface argc c-argv))
+	  (wlc-run)
+	  (free output keyboard view pointer c-argv)))))
 
 
 
@@ -89,25 +93,36 @@
 	   (cl-exec "weston-terminal"))
 	  (t 1)))
 
+(defcallback bare-view-created bool
+    ((view wlc-handle))
+  (format out "view created ~a~%" view)
+  (wlc-view-bring-to-front view)
+  (wlc-view-focus view) t)
+(defcallback bare-view-focus :void
+    ((view wlc-handle)
+     (focus bool))
+  (wlc-view-set-state +state-activated+ focus))
 (defun bare-wm ()
-  (let* ((interface
+  (let* ((interface ;(alloc 'wlc-interface))
 	  (foreign-funcall "bare_s_interface" :pointer))
 	 (argc 1)
 	 (argv (foreign-alloc :string
-			      :initial-contents '("dummy")
+			      :initial-contents '("dummy"); "--log" "/home/log")
 			      :null-terminated-p t))
 	 (keyboard (alloc 'wlc-interface-keyboard))
 	 (view (alloc 'wlc-interface-view)))
-    (set-struct-val view 'wlc-interface-view 'created (callback view-created))
-    (set-struct-val view 'wlc-interface-view 'focus (callback view-focus))
+    (set-struct-val view 'wlc-interface-view 'created (callback bare-view-created))
+    (set-struct-val view 'wlc-interface-view 'focus (callback bare-view-focus))
     (set-struct-val interface 'wlc-interface 'view view)
-    (set-struct-val keyboard 'wlc-interface-keyboard 'key (callback bare-kb))
-    (set-struct-val interface 'wlc-interface 'keyboard keyboard)
+    ;(set-struct-val keyboard 'wlc-interface-keyboard 'key (callback bare-kb))
+    ;(set-struct-val interface 'wlc-interface 'keyboard keyboard)
     (format out "cl-wlc init~%")
-    (unless (zerop (wlc-init interface argc argv))
-      (format out "cl-wlc init success~%cl-wlc running~%")
-      (wlc-run)
-      (format out "cl-wlc freeing lisp allocated variables~%")
-      (foreign-string-free argv)
-      (free keyboard view)
-      (format out "cl-wlc free success~%"))))
+    (bt:make-thread (lambda ()
+		      (unless (zerop (wlc-init interface argc argv))
+			(format out "cl-wlc init success~%cl-wlc running~%")
+			(wlc-run)
+			(format out "cl-wlc freeing lisp allocated variables~%")
+					;(foreign-string-free argv)
+			(free keyboard view argv)
+			(format out "cl-wlc free success~%")
+			(wlc-terminate))))))

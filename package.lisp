@@ -12,6 +12,7 @@
 	   :focused-output-mask
 	   :output-resolution
 	   :output-focus
+	   :output-views-masked
 	   
 	   :view-mask
 	   :view-state
@@ -29,7 +30,9 @@
 	   :view-output
 	   :view-title
 	   :view-id
-	   
+	   :get-next-view
+	   :get-previous-view
+	   :get-topmost-view
 
 	   :managedp
 	   :override-redirectp
@@ -48,10 +51,21 @@
 	   :view-geometry
 	   :geometry-size
 	   :geometry-origin
-           
-           :wlc-terminate
-	   :cl-exec))	   
+	   :parse-mod-bit
 
+	   ;:exec-term
+	   :exec
+	   ;:c-wlc-exec
+	   
+:+MODAL+ 	:+OVERRIDE+ 	:+POPUP+
+:+SPLASH+ 	:+UNMANAGED+ 	:+BUTTON-PRESSED+
+:+PRESSED+ 	:+RELEASED+
+:+LOG-ERROR+ 	:+LOG-INFO+ 	:+LOG-WARN+
+:+ACTIVATED+ 	:+FULLSCREEN+ 	:+MAXIMIZED+
+:+MOVING+ 	:+RESIZING+
+:+mod-shift+ :+mod-caps+ :+mod-ctrl+
+:+mod-alt+ :+mod-mod2+ :+mod-mod3+
+:+mod-logo+ :+mod-mod5+))
 	   
 	   
 	   

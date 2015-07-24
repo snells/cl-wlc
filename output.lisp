@@ -14,9 +14,9 @@
   (let ((views)
 	(m)
 	(ret '()))
-    (with-foreign-object (memb 'size-t)
+    (with-foreign-object (memb 'uint)
       (setf views (wlc-output-get-views output memb))
-      (setf m (mem-aref memb 'size-t)))
+      (setf m (mem-aref memb 'uint)))
     (dotimes (x m)
       (push (ref-handle views x) ret))
     (reverse ret)))
@@ -34,16 +34,27 @@
   (let ((pt)
 	(count)
 	(ret '()))
-    (with-foreign-object (memb 'size-t)
+    (with-foreign-object (memb 'uint)
       (setf pt (wlc-get-outputs memb))
-      (setf count (mem-aref memb 'size-t)))
+      (setf count (mem-aref memb 'uint)))
     (dotimes (x count)
       (push (ref-handle pt x) ret))
 					;(pt-handle pt x) ret))
     (reverse ret)))
 
 (defun output-resolution (output)
-  (wlc-output-get-resolution output))
+  (cond ((zerop output) '(0 0))
+	(t (let ((r (wlc-output-get-resolution output))
+		 (w)
+		 (h))
+	     (setf w (struct-val r 'wlc-size 'w)
+		   h (struct-val r 'wlc-size 'h))
+	     (list w h)))))
+
+
+
+
+
 (defun (setf output-resolution) (val output)
   (with-foreign-object (r 'wlc-size)
     (setf (ref-wlc-size r) val)
@@ -52,4 +63,13 @@
 (defun output-focus (output)
   (wlc-output-focus output))
 
+
+(defun output-views-masked (output)
+  (let ((ret '())
+	(views (output-views output))
+	(o-mask (output-mask output)))
+    (dolist (view views)
+      (if (= o-mask (view-mask view))
+	  (push view ret)))
+    (reverse ret)))
 

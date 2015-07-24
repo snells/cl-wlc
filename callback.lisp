@@ -19,7 +19,7 @@
 (defvar callback-fn-view-created
   (lambda (view)
     (format out "view created~a~%" view)
-    (view-set-state view +state-activated+ t)
+    (view-set-state view +activated+ t)
     (view-bring-to-front view)
     (view-focus view) 1))
 
@@ -30,7 +30,7 @@
 (defvar callback-fn-view-focus
   (lambda (view focus)
     (format out "view-focus~a geo ~a~%" view (view-geometry view))
-    (view-set-state view +state-activated+ t)
+    (view-set-state view +activated+ t)
     (view-bring-to-front view)
     (view-focus view) 1))
 
@@ -46,7 +46,7 @@
 (defvar callback-fn-keyboard-key
   (lambda (view time modifiers key sym state)
     (format out "Keyboard event view ~a time ~a key ~a sym ~a state ~a mod ~a~%"
-	    view time key sym (ref-wlc-modifiers modifiers) state)
+	    view time key sym state (ref-wlc-modifiers modifiers))
     (let ((bit (parse-mod-bit modifiers)))
       (cond ((/= 0 (logand bit 4)) ; ctrl
 	     (cond (exec-delay (setf exec-delay nil)) ; prevent second press
@@ -54,14 +54,19 @@
 		 (format out "trying weston~%")
 		 (cl-exec "weston-terminal")
 		 (setf exec-delay t) nil)
+		((= sym #x31)
+		 (format out "TRYING WESTON TERMINAL~%")
+		 (exec))
 		((= sym #x71) ; #\q
-		 (format out "closing view ~a~%" view)
-		 (view-close view)
-		 (setf exec-delay t) nil)
+		 (let ((output (view-output view)))
+		   (format out "closing view ~a~%" view)
+		   (view-close view)
+		   (focus-view (get-topmost-view output))
+		   (setf exec-delay t) nil))
 		((= sym #xff1b) ;#\Escape
 		 (format out "terminating~%")
 		 (wlc-terminate))
-		(t 1)))
+		(t t)))
 	    ((/= 0 (logand bit 8)) ; alt
 	     (test-view-fns view sym)) ; test.lisp
 	    (t t))))) ; key not handled return true
@@ -123,42 +128,42 @@
 
 (defcallback keyboard-key bool
     ((view wlc-handle)
-     (time :uint32)
-     (modifiers c-wlc-modifiers)
-     (key :uint32)
-     (sym :uint32)
+     (time u32)
+     (modifiers (:pointer wlc-modifiers))
+     (key u32)
+     (sym u32)
      (state wlc-key-state))
     (funcall callback-fn-keyboard-key view time modifiers key sym state))
 
 (defcallback pointer-button bool
   ((view wlc-handle)
-   (time :uint32)
-   (modifiers c-wlc-modifiers)
-   (button :uint32)
+   (time u32)
+   (modifiers (:pointer wlc-modifiers))
+   (button u32)
    (state wlc-button-state))
   (funcall callback-fn-pointer-button view time modifiers button state))
 
 (defcallback pointer-scroll bool
   ((view wlc-handle)
-   (time uint32-t)
-   (modifiers c-wlc-modifiers)
-   (axis uint8-t)
+   (time u32)
+   (modifiers (:pointer wlc-modifiers))
+   (axis u8)
    (amount :pointer))
   (funcall callback-fn-pointer-scroll view time modifiers axis amount))
 
 (defcallback pointer-motion bool
   ((view wlc-handle)
-   (time :uint32)
+   (time u32)
    (origin :pointer))
   (funcall callback-fn-pointer-motion view time origin))
 
 (defcallback touch-touch bool
   ((view wlc-handle)
-   (time uint32-t)
-   (modifiers c-wlc-modifiers)
+   (time u32)
+   (modifiers (:pointer wlc-modifiers))
    (type wlc-touch-type)
-   (slot int32-t)
-   (origin c-wlc-origin))
+   (slot int32)
+   (origin (:pointer wlc-origin)))
   (funcall callback-fn-touch-touch view time modifiers type slot origin))
 
 (defcallback compositor-ready :void

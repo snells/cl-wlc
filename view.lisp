@@ -40,12 +40,12 @@
 
 (defun managedp (view)
   (let ((type (view-type view)))
-    (if (or (zerop (logand type +bit-unmanaged+))
-	    (zerop (logand type +bit-popup+))
-	    (zerop (logand type +bit-splash+)))
+    (if (or (zerop (logand type +unmanaged+))
+	    (zerop (logand type +popup+))
+	    (zerop (logand type +splash+)))
 	nil t)))
 (defun override-redirectp (view)
-  (if (zerop (logand (view-type view) +bit-override+)) nil t))
+  (if (zerop (logand (view-type view) +override+)) nil t))
 
 
 (defun zero-andp (&rest numbers)
@@ -55,9 +55,9 @@
 (defun test-view-type (view type)
   (if (zero-andp (view-type view) type) nil t))
 (defun view-fullscreenp (view)
-  (test-view-state view +state-fullscreen+))
+  (test-view-state view +fullscreen+))
 (defun view-splashp (view)
-  (test-view-type view +bit-splash+))
+  (test-view-type view +splash+))
 
 (defun view-bring-to-front (view)
   (wlc-view-bring-to-front view))
@@ -81,14 +81,40 @@
 (defun (setf view-id) (id view)
   (wlc-view-set-app-id view id))
 
+(defun focus-view (view)
+  (cond ((zerop view) (view-focus 0))
+	(t 
+	 (view-set-state view +activated+ t)
+	 (view-bring-to-front view)
+	 (view-focus view))))
 
+(defun get-next-view (view)
+  (let ((views (output-views-masked (view-output view)))
+	(b view)
+	(s view))
+    (cond ((null views) 0)
+	  (t (dolist (v views)
+	       (cond ((< v s) (setf s v))
+		     ((and (> b view) (< v b))
+		      (setf b v))
+		     ((and (= b view) (> v b))
+		      (setf b v))))
+	     (if (> b view) b s)))))
+		 
+	   
+(defun get-previous-view (view)
+  (let ((views (output-views-masked (view-output view)))
+	(b view)
+	(s view))
+    (cond ((null views) 0)
+	  (t (dolist (v views)
+	       (cond ((> v b) (setf b v))
+		     ((and (< s view) (> v s))
+		      (setf s v))
+		     ((and (= s view) (< v s))
+		      (setf s v))))
+	     (if (< s view) s b)))))
 
-
-
-
-
-
-
-
-
+(defun get-topmost-view (output)
+  (car (output-views-masked output)))
 

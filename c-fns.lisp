@@ -31,20 +31,20 @@
 
 (cffi:defcfun "wlc_view_set_state"  :void
   (view wlc-handle)
-  (state view-state-bit)
+  (state wlc-view-state)
   (toggle bool))
 
 (cffi:defcfun "wlc_view_focus" :void
   (view (:pointer wlc-handle)))
 
-(defcfun ("wlc_interface" get-wlc-interface) :pointer)
+;(defcfun ("wlc_interface" get-wlc-interface) :pointer)
 
 (defcfun ("wlc_log" c-wlc-log) :void
   (type wlc-log-type)
   (fmt :pointer))
 
 (defcfun ("wlc_exec" c-wlc-exec) :void
-  (bin :pointer)
+  (bin :string);:pointer)
   (argv :pointer))
 					;(args :pointer))
 (defcfun "cl_exec" :void
@@ -77,15 +77,15 @@
 (defcfun "wlc_output_set_resolution" :void
   (output wlc-handle)
   (resolution (:pointer wlc-size)))
-(defcfun "wlc_output_get_mask" uint32-t
+(defcfun "wlc_output_get_mask" u32
   (output wlc-handle))
 (defcfun "wlc_output_set_mask" :void
   (output wlc-handle)
-  (mask uint32-t))
+  (mask u32))
 (defcfun "wlc_output_set_views" bool
   (output wlc-handle)
   (views :pointer)
-  (memb size-t))
+  (memb uint)) ;;; size_t, should it be 8 bytes?
 (defcfun "wlc_output_focus" :void
   (output wlc-handle))
 
@@ -101,16 +101,16 @@
 (defcfun "wlc_view_send_below" :void
   (view wlc-handle)
   (other wlc-handle))
-(defcfun "wlc_view_get_mask" uint32-t
+(defcfun "wlc_view_get_mask" u32
   (view wlc-handle))
 (defcfun "wlc_view_set_mask" :void
   (view wlc-handle)
-  (mask uint32-t))
-(defcfun "wlc_view_get_state" uint32-t
+  (mask u32))
+(defcfun "wlc_view_get_state" u32
   (view wlc-handle))
 (defcfun "wlc_view_set_state" :void
   (view wlc-handle)
-  (type wlc-view-state-bit)
+  (type wlc-view-state)
   (toggle bool))
 (defcfun "wlc_view_get_geometry" :pointer
   (view wlc-handle))
@@ -119,11 +119,11 @@
   (geometry :pointer))
 (defcfun "wlc_view_get_parent" wlc-handle
   (view wlc-handle))
-(defcfun "wlc_view_get_type" uint32-t
+(defcfun "wlc_view_get_type" u32
   (view wlc-handle))
 (defcfun "wlc_view_set_type" :void
   (view wlc-handle)
-  (type wlc-view-type-bit)
+  (type wlc-view-type)
   (toggle bool))
 
 (defcfun "wlc_view_set_parent" :void

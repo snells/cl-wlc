@@ -5,13 +5,13 @@
   :description "Bindings for wlc library"
   :author "Sakari Snäll stesna@utu.fi"
   :license "The MIT License (MIT)"
-  :depends-on (#:cffi #:cffi-libffi #:cffi-grovel)
+  :depends-on (#:cffi #:bordeaux-threads)
   :components ((:file "package")
 	       (:file "util")
 	       (:file "c-util")
 	       (:file "enums")
 	       (:file "struct")
-	       (cffi-grovel:grovel-file "grovel")
+	       ;(cffi-grovel:grovel-file "grovel")
 	       (:file "types")
 	       (:file "c-fns")
 	       (:file "lispy")
