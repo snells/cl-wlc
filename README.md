@@ -1,5 +1,14 @@
 # cl-wlc
-Common lisp bindings to [wlc](https://github.com/Cloudef/wlc) for making wayland window managers.
+Common lisp bindings to [wlc](https://github.com/Cloudef/wlc) for making wayland window managers.        
+
+
+Currently runs on ccl and sbcl but launching the wlc makes it so that you won't go into debugger you will just crash.   
+Also after you exit your lisp interpreter it prints some pointers.   
+I think that the wlcs threading messes with lisps memory?   
+So currently it's not safe to use this and I think that I can't fix it.   
+I have tested wlc on ecl and it worked, there was no memory errors and you could go into debugger.   
+Sadly cl-wlc does not work with ecl, at least it does not run on my machine.   
+I think the error might come from trying to use cffi grovel on ecl.
 
 
 cl-wlc provides bare but lispy api to wlc.   
