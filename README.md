@@ -2,19 +2,13 @@
 Common lisp bindings to [wlc](https://github.com/Cloudef/wlc) for making wayland window managers.        
 
 
-Currently runs on ccl and sbcl but launching the wlc makes it so that you won't go into debugger you will just crash.   
-Also after you exit your lisp interpreter it prints some pointers.   
-I think that the wlcs threading messes with lisps memory?   
-So currently it's not safe to use this and I think that I can't fix it.   
-I have tested wlc on ecl and it worked, there was no memory errors and you could go into debugger.   
-Sadly cl-wlc does not work with ecl, at least it does not run on my machine.   
-I think the error might come from trying to use cffi grovel on ecl.
+Currently cl-wlc only works properly with ecl.   
+It can run on sbcl and ccl but they are more unstable and after you exit the wm you will get errors.   
 
 
 cl-wlc provides bare but lispy api to wlc.   
 All the functions from wlc.h have been translated and most of them work.  
 I didn't have success with cffi's translate methods so some callback functions take pointer as parameter but there are functions to get lispy value from them.   
-Currently cl-wlc is unstable and might crash when executed.   
 
 
 ### Dependencies
@@ -22,7 +16,7 @@ Currently cl-wlc is unstable and might crash when executed.
 
 Build tools for wlc, see https://github.com/Cloudef/wlc   
 [quicklisp](https://www.quicklisp.org/beta/)   
-cffi and libcffi   
+cffi    
 
 ### Install
 
@@ -50,55 +44,63 @@ There are functions to set focus on different outputs but that does not seems to
 Outputs and and views have masks which you can use to implement different workspaces.   
 
 
-##### Outputs   
+### Types   
+##### type-name type   
+attribute attribute-type - more info
+
+
+##### Output uint   
 views list of views   
 mask int   
 resolution list of ints (width height)   
-##### Views   
+##### View int   
 mask int   
-type int, \*bit-override\* \*bit-unmanaged\* \*bit-splash\* \*bit-modal\* \*bit-popup\*  
-state int, \*state-maximized\* \*state-fullscreen\* \*state-resizing\* \*state-moving\* \*state-activated\*  
+type int, \*override\* \*unmanaged\* \*splash\* \*modal\* \*popup\*  
+state int, \*maximized\* \*fullscreen\* \*resizing\* \*moving\* \*activated\*  
 currently callbacks that take parameter state receive keyword :pressed or :released.   
 parent view   
-output   output  
+output output  
 title string   
 id   string   
 geometry list of origin and size   
-##### Origin   
-list of ints (x y)   
-##### Size   
-list of ints (w h) 
+##### Origin list   
+x int   
+y int   
+##### Size list   
+int w   
+int h   
 calbacks that take size as parameter receive pointer, you can use function (ref-wlc-size size) => (w h)   
-##### Modifiers   
+##### Modifiers pointer   
 c-struct that has byte mods and byte leds.   
 mods, shift 1 caps 2 ctrl 4 alt 8 mod2 16 mod3 32 log0 64 mod5 128    
 Not sure what the different leds values mean.   
 keyboard-key and pointer-button callbacks have argument of type modifiers.   
 Currently modifiers is pointer, you can use fuction (ref-wlc-modifiers modifiers) => (mods leds) ; where mods and leds are ints.   
-##### Focus   
-lisp boolean   
+##### Focus lisp-boolean   
 
 
 ### Usage   
-Currently running cl-wlc from slime might be more unstable.   
 
 ```
 (use-package :cl-wlc)
 (run-wm '("my-wm-name" "--log" "/home/log"))
 ;;; starts the wm
+;;; Cotrol + Esc - quit   
+;;; C-f - start weston-terminal   
 ;;; there is also more simplified function for testing purposes
 (bare-wm)
 ;;;start the wm
 
 ;prototype
-(run-wm (argv &key view-created view-destroyed view-focus
+(run-wm (argv &key threaded view-created view-destroyed view-focus
                       view-move-to-output
                       output-created output-destroyed output-focus
                       output-resolution keyboard-key pointer-button
                       pointer-scroll pointer-motion touch compositor-ready))
 ```
 
-argv is list of strings that will be given to wlc.   
+argv is list of strings that will be given to wlc.  
+By default threaded is nil, when true the wm will be run on it's own thread.   
 You should pass a function to key arguments.   
 Prototypes for the callback functions, see callback.lisp   
 modifiers, size, origin, amount = pointers   
@@ -123,22 +125,18 @@ compositor-ready (lambda ()) => void
 ### Modifications to original wlc
 
 I had to modify wlc a bit to get it work.   
-In the original the interface struct are not typedef'ed  and I had to typedef them to get something working.   
-Can't remember if grovel couldn't be used without c struct being typedefined or was it for something else.      
 void wlc_exec(const char *bin, char *const args[]);   
 Coudln't get it work so I defined new function   
 void cl_exec(char *bin) { wlc_exec(bin, (char *const[]) { bin, NULL }); }   
 That's easier to translate with cffi.     
 When I tried allocating wlc-interface in lisp I couldn't get it to run.   
 So I made new function bare_s_interface which returns pointer to wlc_interface.   
-There might be no need for bare_s_interface after I started using grovel but I think it's more stable when using bare_s_interface instead of allocating wlc-interface in lisp.   
+
 
 
 ### Issues   
 
-When starting wlc the interface structure has to be allocated using bare reference to cstruct.   
-cffi will give style error from.      
-Crashes sometimes on start, no idea why.      
-When wlc is running and there is error the lisp won't go to debugger, instead it will just crash.   
-So any typo, type error, whatever that passes compiler will most likely cause crash somewhere.
+
+Crashes sometimes on sbcl and ccl.   
+Error while running wm will crash the lisp instead of going to debugger.
 
