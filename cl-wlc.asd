@@ -1,5 +1,5 @@
-(cl:eval-when (:load-toplevel :execute)
-  (asdf:operate 'asdf:load-op 'cffi-grovel))
+;(cl:eval-when (:load-toplevel :execute)
+;  (asdf:operate 'asdf:load-op 'cffi-grovel))
 (asdf:defsystem #:cl-wlc
   :serial t
   :description "Bindings for wlc library"

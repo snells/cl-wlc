@@ -4,6 +4,7 @@
   (:use #:cl #:cffi)
   (:export :run-wm
 	   :bare-wm
+	   :wlc-terminate
 	   
 	   :output-views
 	   :focused-output
@@ -53,9 +54,20 @@
 	   :geometry-origin
 	   :parse-mod-bit
 
-	   ;:exec-term
+	   :callback-view-created
+	   :callback-view-destroyed 
+	   :callback-view-focus 
+	   :callback-view-move-to-output
+	   :callback-output-created
+	   :callback-output-destroyed
+	   :callback-output-focus
+	   :callback-output-resolution
+	   :callback-keyboard-key
+	   :callback-pointer-button
+	   :callback-pointer-motion
+	   :callback-pointer-scroll
+
 	   :exec
-	   ;:c-wlc-exec
 	   
 :+MODAL+ 	:+OVERRIDE+ 	:+POPUP+
 :+SPLASH+ 	:+UNMANAGED+ 	:+BUTTON-PRESSED+

@@ -4,11 +4,6 @@
 
 ;;; see callback.lisp for callback-fn prototypes
 
-;;; use bare reference to structures
-;;; Otherwise the program will be very unstable or crash right away
-;;; is it safe to use ctypes defined with (:struct type) elsewhere?
-;;; or should you just use the deprecated bare reference?
-
 
 (defun run-wm (argv &key threaded
 		      view-created view-destroyed view-focus
@@ -17,25 +12,25 @@
 		      output-resolution keyboard-key pointer-button
 		      pointer-scroll pointer-motion touch compositor-ready)
 
-  (if view-created (setf callback-fn-view-created view-created))
-  (if view-destroyed (setf callback-fn-view-destroyed view-destroyed))
-  (if view-focus (setf callback-fn-view-focus view-focus))
-  (if view-move-to-output (setf callback-fn-view-move-to-output view-move-to-output))
+  (if view-created (setf callback-view-created view-created))
+  (if view-destroyed (setf callback-view-destroyed view-destroyed))
+  (if view-focus (setf callback-view-focus view-focus))
+  (if view-move-to-output (setf callback-view-move-to-output view-move-to-output))
 
-  (if output-created (setf callback-fn-output-created output-created))
-  (if output-destroyed (setf callback-fn-output-destroyed output-destroyed))
-  (if output-focus (setf callback-fn-output-focus output-focus))
-  (if output-resolution (setf callback-fn-output-resolution output-resolution))
+  (if output-created (setf callback-output-created output-created))
+  (if output-destroyed (setf callback-output-destroyed output-destroyed))
+  (if output-focus (setf callback-output-focus output-focus))
+  (if output-resolution (setf callback-output-resolution output-resolution))
 
-  (if keyboard-key (setf callback-fn-keyboard-key keyboard-key))
+  (if keyboard-key (setf callback-keyboard-key keyboard-key))
 
-  (if pointer-button (setf callback-fn-pointer-button pointer-button))
-  (if pointer-motion (setf callback-fn-pointer-motion pointer-motion))
-  (if pointer-scroll (setf callback-fn-pointer-scroll pointer-scroll))
+  (if pointer-button (setf callback-pointer-button pointer-button))
+  (if pointer-motion (setf callback-pointer-motion pointer-motion))
+  (if pointer-scroll (setf callback-pointer-scroll pointer-scroll))
 
-  (if touch (setf callback-fn-touch-touch touch))
+  (if touch (setf callback-touch-touch touch))
 
-  (if compositor-ready (setf callback-fn-compositor-ready compositor-ready))
+  (if compositor-ready (setf callback-compositor-ready compositor-ready))
   
   (let* ((interface ;(alloc 'c-wlc-interface))
 	  ;; I made c function to return pointer to interface
@@ -45,22 +40,26 @@
 	 (c-argv (foreign-alloc :string
 				:initial-contents argv
 				:null-terminated-p t))
-	 (output (alloc 'wlc-interface-output))
-	 (keyboard (alloc 'wlc-interface-keyboard))
-	 (view (alloc 'wlc-interface-view))
-	 (pointer (alloc 'wlc-interface-pointer)))
-    (set-struct-val output 'wlc-interface-output 'created (callback output-created))
-    (set-struct-val output 'wlc-interface-output 'resolution (callback output-resolution))
-					;(set-struct-val output 'wlc-interface-output 'destroyed (callback output-destroyed))
+	 (output (alloc 'interface-output))
+	 (keyboard (alloc 'interface-keyboard))
+	 (view (alloc 'interface-view))
+	 (pointer (alloc 'interface-pointer))
+	 (touch (alloc 'interface-touch)))
+    (set-struct-val output 'interface-output 'created (callback output-created))
+    (set-struct-val output 'interface-output 'resolution (callback output-resolution))
+    (set-struct-val output 'wlc-interface-output 'destroyed (callback output-destroyed))
     (set-struct-val interface 'wlc-interface 'output output)
-    (set-struct-val pointer 'wlc-interface-pointer 'button (callback pointer-button))
+    (set-struct-val pointer 'interface-pointer 'button (callback pointer-button))
     (set-struct-val interface 'wlc-interface 'pointer pointer)
-    (set-struct-val view 'wlc-interface-view 'created (callback view-created))
-    (set-struct-val view 'wlc-interface-view 'focus (callback view-focus))
-					;(set-struct-val view 'wlc-interface-view 'destroyed (callback view-destroyed))
+    (set-struct-val view 'interface-view 'created (callback view-created))
+    (set-struct-val view 'interface-view 'focus (callback view-focus))
+    (set-struct-val view 'wlc-interface-view 'destroyed (callback view-destroyed))
     (set-struct-val interface 'wlc-interface 'view view)
-    (set-struct-val keyboard 'wlc-interface-keyboard 'key (callback keyboard-key))
+    (set-struct-val keyboard 'interface-keyboard 'key (callback keyboard-key))
     (set-struct-val interface 'wlc-interface 'keyboard keyboard)
+    ;(set-struct-val touch 'interface-touch 'touch (callback touch-touch))
+    ;(set-struct-val interface 'wlc-interface 'touch touch)
+    
     (format out "cl-wlc init~%")
     (if threaded
 	(bt:make-thread (lambda ()
@@ -72,7 +71,11 @@
 			  (format out "cl-wlc free success~%"))))
 	(unless (zerop (wlc-init interface argc c-argv))
 	  (wlc-run)
-	  (free output keyboard view pointer c-argv)))))
+	  (format out "cl-wlc freeing lisp allocated variables~%")
+	  (free output keyboard view pointer touch c-argv)
+	  (format out "cl-wlc free success~%")))))
+
+
 
 
 

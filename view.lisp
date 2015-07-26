@@ -116,5 +116,5 @@
 	     (if (< s view) s b)))))
 
 (defun get-topmost-view (output)
-  (car (output-views-masked output)))
-
+  (let ((v (car (output-views-masked output))))
+    (if (null v) 0 v)))
