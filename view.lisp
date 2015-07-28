@@ -4,7 +4,8 @@
   (ref-wlc-geometry (wlc-view-get-geometry view)))
 
 (defun (setf view-geometry) (val view)
-  (with-foreign-object (g 'wlc-geometry)
+					;(with-foreign-object (g 'wlc-geometry)
+  (let ((g (wlc-view-get-geometry view)))
     (setf (ref-wlc-geometry g) val)
     (wlc-view-set-geometry view g)))
 
@@ -95,11 +96,13 @@
     (cond ((null views) 0)
 	  (t (dolist (v views)
 	       (cond ((< v s) (setf s v))
-		     ((and (> b view) (< v b))
+		     ((and (> v view) (< v b))
 		      (setf b v))
 		     ((and (= b view) (> v b))
 		      (setf b v))))
-	     (if (> b view) b s)))))
+		    (if (> b view) b s)))))
+
+
 		 
 	   
 (defun get-previous-view (view)
@@ -109,7 +112,7 @@
     (cond ((null views) 0)
 	  (t (dolist (v views)
 	       (cond ((> v b) (setf b v))
-		     ((and (< s view) (> v s))
+		     ((and (< v view) (> v s))
 		      (setf s v))
 		     ((and (= s view) (< v s))
 		      (setf s v))))
