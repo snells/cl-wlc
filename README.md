@@ -57,7 +57,6 @@ resolution list of ints (width height)
 mask int   
 type int, \*override\* \*unmanaged\* \*splash\* \*modal\* \*popup\*  
 state int, \*maximized\* \*fullscreen\* \*resizing\* \*moving\* \*activated\*  
-currently callbacks that take parameter state receive keyword :pressed or :released.   
 parent view   
 output output  
 title string   
@@ -101,8 +100,8 @@ Currently modifiers is pointer, you can use fuction (ref-wlc-modifiers modifiers
 
 
 If key parameters functions are provided they will set callback variables, otherwise they use the default placeholder function.   
-Callback variables are named cl-wlc:callback-<function-name>   
-For example cl-wlc:callback-view-created
+Callback variables are named cl-wlc:callback-function-name    
+For example cl-wlc:callback-view-created   
 To redefine callback function you need setf the value of callback variable to the new function.   
 ```
 ; when running on differend thread standard output might not be the output you want
