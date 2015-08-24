@@ -14,7 +14,9 @@
 
 (defcstruct wlc-interface-view-request
   (geometry :pointer)
-  (state :pointer))
+  (state :pointer)
+  (move :pointer)
+  (resize :pointer))
 
 (defcstruct wlc-interface-view
   (created :pointer)

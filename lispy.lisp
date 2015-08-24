@@ -5,9 +5,8 @@
   (mem-aptr h 'wlc-handle offset))
 
 (defun exec (name)
-  (with-foreign-string (s name)
-    (cl-exec s)))
-
+  (cl-exec name))
+  ;(c-wlc-exec "weston-terminal" (make-pointer 0)))
 
 (defun ref-wlc-modifiers (pt)
   (list (struct-val pt 'wlc-modifiers 'leds)
@@ -17,6 +16,7 @@
   (list (struct-val pt 'wlc-size 'w)
 	(struct-val pt 'wlc-size 'h)))
 (defun (setf ref-wlc-size) (val pt)
+    (format out "setting size to ~a~%" val)
   (set-struct-val pt 'wlc-size 'w (car val))
   (set-struct-val pt 'wlc-size 'h (cadr val)))
 
@@ -24,16 +24,30 @@
   (list (struct-val pt 'wlc-origin 'x)
 	(struct-val pt 'wlc-origin 'y)))
 (defun (setf ref-wlc-origin) (val pt)
+  (format out "setting origin to ~a~%" val)
   (set-struct-val pt 'wlc-origin 'x (car val))
   (set-struct-val pt 'wlc-origin 'y (cadr val)))
 (defun ref-wlc-geometry (pt)
   (list (ref-wlc-origin (struct-pt pt 'wlc-geometry 'origin))
 	(ref-wlc-size (struct-pt pt 'wlc-geometry 'size))))
+;(defun (setf ref-wlc-geometry) (val pt)
+;  (let* ((g pt)
+; 	 (o (setf (ref-wlc-origin (struct-pt g 'wlc-geometry 'origin)) (car val)))
+; 	 (s (setf (ref-wlc-size (struct-pt g 'wlc-geometry 'size)) (cadr val))))
+;    (list o s)))
+
 (defun (setf ref-wlc-geometry) (val pt)
-  (let* ((g (struct-pt pt 'wlc-geometry))
-	 (o (setf (ref-wlc-origin g) (car val)))
-	 (s (setf (ref-wlc-size g) (cadr val))))
-    (list o s)))
+  (let* ((g pt)
+	 (origin (car val))
+	 (size (cadr val))
+	 (o (struct-pt g 'wlc-geometry 'origin))
+	 (s (struct-pt g 'wlc-geometry 'size)))
+    (set-struct-val o 'wlc-origin 'x (car origin))
+    (set-struct-val o 'wlc-origin 'y (cadr origin))
+    (set-struct-val s 'wlc-size 'w (car size))
+    (set-struct-val s 'wlc-size 'h (cadr size))))
+
+
 
 (defun geometry-size (lst)
   (cadr lst))
@@ -47,14 +61,4 @@
 (defun parse-mod-bit (pt)
   (struct-val pt 'wlc-modifiers 'mods))
 
-(defmacro test-fns (view)
-  (let ((l '()))
-    (let ((fns '(#'managedp #'override-redirectp
-		 #'view-splashp #'view-fullscreenp #'view-parent
-		 #'view-state #'view-type #'view-output #'view-mask)))
-      (dolist (fn fns)
-	(push `(progn (format out "testing ~a~%" ,fn)
-		      (format out "~a~%" (funcall ,fn ,view))
-		      (format out "success ~a~%" ,fn)) l)))
-    `(progn ,@l)))
 

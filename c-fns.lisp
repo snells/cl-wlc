@@ -116,6 +116,7 @@
   (view wlc-handle))
 (defcfun "wlc_view_set_geometry" :void
   (view wlc-handle)
+  (edges u32)
   (geometry :pointer))
 (defcfun "wlc_view_get_parent" wlc-handle
   (view wlc-handle))

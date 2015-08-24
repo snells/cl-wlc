@@ -1,8 +1,8 @@
 (in-package :cl-wlc)
 
 
-;;; callbacks that return type bool should return lisp boolean (t nil)
-;;; means 0 is also true
+;;; callbacks that return type bool should return lisp boolean t or nil, number 0 is considered true
+
 
 (defvar callback-output-created
   (lambda (output)
@@ -22,6 +22,8 @@
     (format out "view created~a~%" view)
     (view-set-state view +activated+ t)
     (view-set-state view +fullscreen+ t)
+    (format out "geometry ~a ~a~%" (wlc-view-get-geometry view)
+	    (ref-wlc-geometry (wlc-view-get-geometry view)))
     (view-bring-to-front view)
     (view-focus view) 1))
   
@@ -79,8 +81,7 @@
     (when (/= view 0)
       (view-set-state view +activated+ t)
       (view-focus view)
-      (view-bring-to-front view))
-      ;(view-set-state view +activated+ t))
+      (view-bring-to-front view))					
     1))
 
   (defvar callback-pointer-scroll
@@ -175,3 +176,4 @@
 (defcallback compositor-ready :void
   ()
   (funcall callback-compositor-ready))
+

@@ -47,7 +47,7 @@
 	 (touch (alloc 'interface-touch)))
     (set-struct-val output 'interface-output 'created (callback output-created))
     (set-struct-val output 'interface-output 'resolution (callback output-resolution))
-    (set-struct-val output 'wlc-interface-output 'destroyed (callback output-destroyed))
+    (set-struct-val output 'interface-output 'destroyed (callback output-destroyed))
     (set-struct-val interface 'wlc-interface 'output output)
     (set-struct-val pointer 'interface-pointer 'button (callback pointer-button))
     (set-struct-val interface 'wlc-interface 'pointer pointer)
@@ -74,12 +74,6 @@
 	  (format out "cl-wlc freeing lisp allocated variables~%")
 	  (free output keyboard view pointer touch c-argv)
 	  (format out "cl-wlc free success~%")))))
-
-
-
-
-
-
 
 
 

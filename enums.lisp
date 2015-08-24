@@ -21,6 +21,23 @@
   (:modal 8)
   (:poput 16))
 
+
+
+
+(defcenum wlc-resize-edge
+    (:edge-none 0)
+  (:edge-top 1)
+  (:edge-bottom 2)
+  (:edge-left 4)
+  (:edge-top-left 5)
+  (:edge-bottom-left 6)
+  (:edge-right 8)
+  (:edge-top-right 9)
+  (:edge-bottom-right 10))
+
+
+
+
 (defcenum modifier-bit
 	      (:mod-shift 1)
 	      (:mod-caps 2)

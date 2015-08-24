@@ -4,10 +4,10 @@
   (ref-wlc-geometry (wlc-view-get-geometry view)))
 
 (defun (setf view-geometry) (val view)
-					;(with-foreign-object (g 'wlc-geometry)
+  ;(with-foreign-object (g 'wlc-geometry)
   (let ((g (wlc-view-get-geometry view)))
     (setf (ref-wlc-geometry g) val)
-    (wlc-view-set-geometry view g)))
+    (wlc-view-set-geometry view 0 g)))
 
 (defun view-mask (view)
   (wlc-view-get-mask view))
