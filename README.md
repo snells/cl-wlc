@@ -99,6 +99,29 @@ Currently modifiers is pointer, you can use fuction (ref-wlc-modifiers modifiers
                       pointer-scroll pointer-motion touch compositor-ready))
 ```
 
+
+If key parameters functions are provided they will set callback variables, otherwise they use the default placeholder function.   
+Callback variables are named cl-wlc:callback-<function-name>   
+For example cl-wlc:callback-view-created
+To redefine callback function you need setf the value of callback variable to the new function.   
+```
+; when running on differend thread standard output might not be the output you want
+(defvar out *standard-output*)
+(use-package :cl-wlc)
+(defun my-view-created (view)
+  (format out "view created~%")
+  t)
+(run-wm '("dummy") :threaded t :view-created #'my-view-created)
+
+; redefine our function
+(defun my-view-created (view)
+  (format out "updated fn~%")
+  t))
+; let the wm use our updated function
+(setf callback-view-created #'my-view-created)
+```   
+
+
 argv is list of strings that will be given to wlc.  
 By default threaded is nil, when true the wm will be run on it's own thread.   
 You should pass a function to key arguments.   

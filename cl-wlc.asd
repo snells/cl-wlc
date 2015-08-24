@@ -17,7 +17,7 @@
 	       (:file "lispy")
 	       (:file "output")
 	       (:file "view")
-	       (:file "test")	       
+	       ;(:file "test")	       
 	       (:file "callback")
 	       (:file "cl-wlc")))
 
