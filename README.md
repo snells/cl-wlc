@@ -1,4 +1,5 @@
 # cl-wlc
+## Project stalled until I have more time, I will try to work on this in summer break
 Common lisp bindings to [wlc](https://github.com/Cloudef/wlc) for making wayland window managers.        
 
 
@@ -32,16 +33,6 @@ now you should be able to succesfully load cl-wlc from your lisp with (ql:quickl
 
 
 You should study [orbment](https://github.com/Cloudef/orbment) to get idea how to really use wlc.  
-I'm still learning so this might misguiding and completely wrong.   
-
-
-Outputs are workspaces, screens or something like that.   
-Views are windows and are inside outputs.   
-Outputs and views are ctype wlc-handle which is just unsigned integer.   
-view/output is bigger than zero and 0 is used for no view/output.   
-(view-focus 3) => focuses view 3, (view-focus 0) => no focus.   
-There are functions to set focus on different outputs but that does not seems to do anything.   
-Outputs and and views have masks which you can use to implement different workspaces.   
 
 
 ### Types   
